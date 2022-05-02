@@ -1,0 +1,49 @@
+#!/bin/bash
+
+TIMESTAMP="$(date +%Y-%m-%d_%H-%M)"
+
+if [[ -f /var/lib/aspia/router.db3 ]] && [[ -f /etc/aspia/router.pub ]] && [[ -f /etc/aspia/router.json ]] && [[ -f /etc/aspia/relay.json ]]; then
+    PUBLIC_KEY="$(cat /etc/aspia/router.pub)"
+
+    echo "All files in place, trying to start Aspia Server..."
+
+    echo "Setting External IP from environment variable - ${EXTERNAL_IP}"
+    jq --arg EXTERNAL_IP "${EXTERNAL_IP}" '.PeerAddress = $EXTERNAL_IP' /etc/aspia/relay.json|sponge /etc/aspia/relay.json
+
+    echo "Setting Router public key in Aspia Relay from 'router.pub' file..."
+    echo "Aspia Router public key is - ${PUBLIC_KEY}"
+    jq --arg PUBLIC_KEY "${PUBLIC_KEY}" '.RouterPublicKey = $PUBLIC_KEY' /etc/aspia/relay.json|sponge /etc/aspia/relay.json
+
+    echo "Ready to start!"
+
+    for cmd in "$@"; do {
+      echo "Process \"$cmd\" started";
+      $cmd & pid=$!
+      PID_LIST+=" $pid";
+    } done
+    trap "kill $PID_LIST" SIGINT
+
+    echo "Parallel processes have started";
+    wait $PID_LIST
+    echo "All processes has been killed";
+
+  else
+
+    echo "Configuration files corrupt - cannot start Aspia Server! Trying to create new..."
+
+    echo "Backuping the old ones..."
+
+    mv /var/lib/aspia/router.db3 /var/lib/aspia/router.db3_r &>/dev/null
+    mv /etc/aspia/router.pub /etc/aspia/router.pub_r &>/dev/null
+    mv /etc/aspia/router.json /etc/aspia/router.json_r &>/dev/null
+    mv /etc/aspia/relay.json /etc/aspia/relay.json_r &>/dev/null
+
+    echo "Generating basic config for Aspia Router"
+    /usr/bin/aspia_router --create-config
+
+    echo "Generating basic config for Aspia Relay"
+    /usr/bin/aspia_relay --create-config
+
+
+fi
+
