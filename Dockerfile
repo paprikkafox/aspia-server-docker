@@ -3,7 +3,7 @@ FROM debian:stable
 WORKDIR "/tmp"
 
 ENV ASPIA_REPO=https://github.com/dchapyshev/aspia
-ENV ASPIA_VERSION=2.5.1 
+ENV ASPIA_VERSION=2.5.2 
 
 RUN apt update && apt install -y curl moreutils htop jq ca-certificates --no-install-recommends && apt clean
 
