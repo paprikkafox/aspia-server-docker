@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  aspia-server:
+    image: paprikkafox/aspia-server:latest
+    container_name: aspia-server
+    hostname: aspia-server
+    environment:
+      - EXTERNAL_IP=88.22.11.33
+    volumes:
+      - ./data/database:/var/lib/aspia:rw
+      - ./data/config:/etc/aspia:rw
+    ports:
+      - 8070:8070
+      - 8060:8060
+    restart: always
