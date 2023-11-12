@@ -1,5 +1,5 @@
 # Сервер Aspia (Relay + Router)
-### Текущая версия - 2.5.2
+### Текущая версия (Current version) - 2.6.4
 
 https://hub.docker.com/r/paprikkafox/aspia-server
 
