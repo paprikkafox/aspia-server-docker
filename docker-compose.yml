@@ -1,4 +1,3 @@
-version: "3.3"
 services:
   aspia-server:
     image: paprikkafox/aspia-server:latest
